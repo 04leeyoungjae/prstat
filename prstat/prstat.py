@@ -82,8 +82,8 @@ def light_bulb_manufacturer(La,Sa,pr_l,pr_s,k,equ=None):
     """
     전구수명찾는 문제입니다. 입력형식 : L타입a, S타입a, L타입확률, S타입확률, k시간, 방정식(디폴트는(1-a)*(a**k))을 받습니다.
     """
+    a=sp.Symbol('a')
     if not equ:
-        a=sp.Symbol('a')
         equ=(1-a)*(a**k)
     try:
         pr_k_s=equ.subs(a,Sa)
@@ -104,6 +104,7 @@ equ=(1-a)*(a**k)
     print(f"pr_k_s : {pr_k_s}")
     print(f"pr_k_l : {pr_k_l}")
     print(f"pr_s_k : {pr_s_k}")
+    print(f"1-pr_l_k : {1-pr_l_k}")
     if pr_s_k>pr_l_k:
         print("S type일것이라고 추측가능")
     else:
