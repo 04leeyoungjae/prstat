@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as f: # README.md 내용 읽어오기
 
 setup(
     name='prstat',
-    version='0.5.4',
+    version='1.0.0',
     license='MIT',
     long_description = long_description,
     long_description_content_type = 'text/markdown',
