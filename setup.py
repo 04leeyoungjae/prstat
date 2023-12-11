@@ -5,7 +5,7 @@ with open('README.md', encoding='utf-8') as f: # README.md 내용 읽어오기
 
 setup(
     name='prstat',
-    version='1.0.0',
+    version='1.0.1',
     license='MIT',
     long_description = long_description,
     long_description_content_type = 'text/markdown',
@@ -14,5 +14,5 @@ setup(
     author_email='leeyoungjae@pusan.ac.kr',
     description='tools for pnu probabilities and statistics class',
     packages=find_packages(),    
-    install_requires=[],
+    install_requires=['sympy'],
 )
