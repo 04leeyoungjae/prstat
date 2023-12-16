@@ -231,7 +231,7 @@ def Ex_PMF(function, min,max):
     return expectation
 
 def Ex_CDF(function, min_value, max_value):
-    print("검증안됌.")
+    print("주의 검증안됨")
     interval = sp.Interval(min_value, max_value)
     expectation = sp.summation(x * (function - function.subs(x, x - 1)), (x, interval.start, interval.end))
     return expectation
@@ -271,7 +271,7 @@ def nth_moment_poisson(function, n, m_min, m_max):
     moment = sp.summation(function.subs(m, m).subs(lamb, lamb) * (m**n), (m, m_min, m_max))
     return expand(moment)
 
-def phi_x(Ef, pdf):
+def phi_x():
     """
     구현이 너무 어렵습니다... 포기
     """
