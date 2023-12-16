@@ -1,13 +1,16 @@
 """
 import sympy as sp는 미리 선언 되어있습니다.
 사용할땐 from prstat.prstat import * 하시면 됩니다.
+function의 미지수는 가능하면 x로 통일해주세요
 참고로 e를 제외한 a-z는 symbol로 설정되어 있으며 e는 자연로그의 밑 e로 선언되어있습니다.
 """
-
 import sympy as sp
+import numpy as np
+from numpy.linalg import matrix_power
 from fractions import Fraction as frac
 a,b,c,d,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z=sp.symbols("a b c d f g h i j k l m n o p q r s t u v w x y z")
-    
+lamb=sp.Symbol('λ')
+
 e=sp.E
 pi=sp.pi
 inf=sp.oo
@@ -21,6 +24,7 @@ integral=sp.integrate
 solve=sp.solve
 branch=sp.Piecewise
 sigma=sp.summation
+expand=sp.expand
 
 def plot(function,min=-10,max=10):
     """
@@ -39,10 +43,13 @@ def fact(n):
     """
     팩토리얼입니다. 내장함수로 제작되었으므로 import 하지마세요
     """
-    ret=1
-    for i in range(1,n+1):
-        ret*=i
-    return ret
+    try:
+        ret=1
+        for i in range(1,n+1):
+            ret*=i
+        return ret
+    except:
+        return sp.factorial(n)
 
 def comb(n,r):
     """
@@ -206,13 +213,94 @@ def is_CDF(function):
     else:
         return 1
 
-def find_c_PDF(function,symbol=x,min=-inf,max=inf):
-    integrated_func=(integral(function,(symbol,min,max)))
-    ret=solve(integrated_func-1,c)
-    return ret[0]
+def find_c_PDF(function,min=-inf,max=inf):
+    return solve(integral(function, (x, min, max)) - 1, c)[0]
 
 def find_c_PMF(function):
     return sp.solve(sp.summation(function,(n,1,inf))-1,c)[0]
-    
-if __name__=="__main__":
-    help(plot)
+
+def Ex_PDF(function,min=-inf,max=inf):
+    c_value = solve(integral(function, (x, min, max)) - 1, c)[0]
+    expectation = integral(x * function.subs(c, c_value), (x, min, max))
+    return expectation
+
+def Ex_PMF(function, min,max):
+    interval=sp.Interval(min,max)
+    c_value = sp.solveset(sp.summation(function, (x, interval.start, interval.end)) - 1, c).args[0]
+    expectation = sp.summation(x * function.subs(c, c_value), (x, interval.start, interval.end))
+    return expectation
+
+def Ex_CDF(function, min_value, max_value):
+    print("검증안됌.")
+    interval = sp.Interval(min_value, max_value)
+    expectation = sp.summation(x * (function - function.subs(x, x - 1)), (x, interval.start, interval.end))
+    return expectation
+
+def game_of_chance(num_games,win_rate,A_lose,A_win):
+    """
+    과제2
+    게임수, 승률, A가잃는돈, A가얻는돈. 잃는돈이 먼저임을 주의!!!
+    예시 : print(game_of_chance(10,frac(1,3),1,3))
+    """
+    win_prob_A = win_rate
+    loss_prob_A = 1 - win_prob_A
+    win_amount_A = A_win
+    loss_amount_A = -A_lose
+    expected_winnings_A = num_games * (win_prob_A * win_amount_A + loss_prob_A * loss_amount_A)
+    return expected_winnings_A
+
+def Ex_and_var(f, Ex, var):
+    """
+    과제3
+    상수는 그대로 더함 일차항은 Ex와 같음 이차항은 var+Ex**2랑 같음
+    """
+    f=sp.expand(f)
+    a = f.coeff(x, 2)
+    b = f.coeff(x, 1)
+    c = f.coeff(x, 0)
+    E_f = (c) + (b * Ex) + (a * (var+Ex*Ex))
+    return E_f
+
+def nth_moment_poisson(function, n, m_min, m_max):
+    """
+    과제4
+    예시 입력
+    f= (lamb**m) * exp(-lamb) / fact(m)
+    print(nth_moment_poisson(f,3,0,inf))
+    """
+    moment = sp.summation(function.subs(m, m).subs(lamb, lamb) * (m**n), (m, m_min, m_max))
+    return expand(moment)
+
+def phi_x(Ef, pdf):
+    """
+    구현이 너무 어렵습니다... 포기
+    """
+    return "포기, 5,6,7안함"
+
+def calculate_statistics(cdf):
+    """
+    과제8
+    CDF를 분석해주는 함수
+    cdf = branch((0,x<0),(x*x,(0<=x) & (x<=1)),(1,x>1))
+    print(calculate_statistics(cdf))
+    평균(mean),분산(var),왜도(skewness),첨도(kurtosis) 순서
+    """
+    mean = sp.integrate(x * sp.diff(cdf, x), (x, -sp.oo, sp.oo))
+    variance_expr = sp.integrate((x - mean)**2 * sp.diff(cdf, x), (x, -sp.oo, sp.oo))
+    variance = sp.simplify(variance_expr)
+    third_moment = sp.integrate((x - mean)**3 * sp.diff(cdf, x), (x, -sp.oo, sp.oo))
+    skewness = sp.simplify(third_moment / variance**(3/2))
+    fourth_moment = sp.integrate((x - mean)**4 * sp.diff(cdf, x), (x, -sp.oo, sp.oo))
+    kurtosis = sp.simplify((fourth_moment / variance**2))
+
+    return map(float,[mean, variance, skewness, kurtosis])
+
+def markov_chain(n,start,arr):
+    """
+    pi_n에서 n값, 어디서 시작했는지, 배열에 관한정보 과제 16번
+    """
+    return matrix_power(arr,n)[start-1]
+
+if __name__ == "__main__":
+    arr=np.array([[0.3,0.5,0.2],[0.3,0.5,0.2],[0.3,0.5,0.2]])
+    print(markov_chain(2,3,arr))
