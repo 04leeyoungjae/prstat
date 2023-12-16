@@ -1,12 +1,13 @@
 """
 import sympy as sp는 미리 선언 되어있습니다.
 사용할땐 from prstat.prstat import * 하시면 됩니다.
+참고로 e를 제외한 a-z는 symbol로 설정되어 있으며 e는 자연로그의 밑 e로 선언되어있습니다.
 """
 
 import sympy as sp
 from fractions import Fraction as frac
-x=sp.Symbol('x')
-y=sp.Symbol('y')
+a,b,c,d,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z=sp.symbols("a b c d f g h i j k l m n o p q r s t u v w x y z")
+    
 e=sp.E
 pi=sp.pi
 inf=sp.oo
@@ -18,7 +19,21 @@ log=sp.log
 diff=sp.diff
 integral=sp.integrate
 solve=sp.solve
+branch=sp.Piecewise
+sigma=sp.summation
 
+def plot(function,min=-10,max=10):
+    """
+    함수를 그래프로 보여주는 함수
+    """
+    sp.plot(function,(x,min,max),axis_center=(0,0))
+    return
+
+def unit(function):
+    """
+    unit step function 입니다. 곱하기가 아닌 unit(function)으로 사용합니다.
+    """
+    return function * sp.Heaviside(function, 1)
 
 def fact(n):
     """
@@ -82,7 +97,6 @@ def light_bulb_manufacturer(La,Sa,pr_l,pr_s,k,equ=None):
     """
     전구수명찾는 문제입니다. 입력형식 : L타입a, S타입a, L타입확률, S타입확률, k시간, 방정식(디폴트는(1-a)*(a**k))을 받습니다.
     """
-    a=sp.Symbol('a')
     if not equ:
         equ=(1-a)*(a**k)
     try:
@@ -112,7 +126,7 @@ equ=(1-a)*(a**k)
     print(pr_error)
     return
 
-def what_is_pmf():
+def what_is_PMF():
     print("PMF stands for Probability Mass Function and usually notated as PX(k). It is used to describe probabilisitc characteristics of a discrete random variable.")
 def what_is_CDF():
     print("CDF stands for Cumulative Distribution Function and usually notated as FX(x). It is used to describe probabilisitc characteristics of a both discrete and continuous random variable.")
@@ -145,23 +159,60 @@ def is_CDF(function):
     """
     CDF인지 판단해주는 함수. 음의무한대극한이 0이고, 무한대극한이 1이고, 감소하지않으며, 연속이여야합니다.
     """
-    if lim(function,x,-inf)!=0:
-        return 0
-    if lim(function,x,inf)!=1:
-        return 0
-    tmp=sp.Symbol('tmp')
-    if sp.simplify(lim(function,x,tmp,'+')-lim(function,x,tmp,'-'))!=0:
-        return 0
-    diff_x=diff(function,x)
-    if sp.solveset(diff_x<0, domain=sp.S.Reals).is_empty!=1:
-        return 0
-    return 1
-    
-    
-    
-    
-    
+    plot(function)
+    error=0
+    try:
+        if lim(function,x,-inf)!=0:
+            print("음의 무한대 극한 0 아님")
+            return 0
+        else:
+            print("음의 무한대 극한 0")
+    except:
+        print("음의 무한대 극한 확인불가")
+        error=1
+    try:
+        if lim(function,x,inf)!=1:
+            print("양의 무한대 극한 1 아님")
+            return 0
+        else:
+            print("양의 무한대 극한 1")
+    except:
+        print("양의 무한대 극한 확인불가")
+        error=1
+    try:
+        tmp=sp.Symbol('tmp')
+        if sp.simplify(lim(function,x,tmp,'+')-lim(function,x,tmp,'-'))!=0:
+            print("연속아님")
+            return 0
+        else:
+            print("연속")
+    except:
+        print("연속확인불가")
+        error=1
+    try:
+        diff_x=diff(function,x)
+        if sp.solveset(diff_x<0, domain=sp.S.Reals).is_empty!=1:
+            print("감소구간확인")
+            return 0
+        else:
+            print("감소구간없음")
+    except:
+        print("감소 확인 불가")
+        error=1
 
-if __name__=="__main__":
-    pass
+    if error:
+        print("에러가 감지되었습니다. 그래프를 보고 알아서 판단하세요.")
+        return -1
+    else:
+        return 1
+
+def find_c_PDF(function,symbol=x,min=-inf,max=inf):
+    integrated_func=(integral(function,(symbol,min,max)))
+    ret=solve(integrated_func-1,c)
+    return ret[0]
+
+def find_c_PMF(function):
+    return sp.solve(sp.summation(function,(n,1,inf))-1,c)[0]
     
+if __name__=="__main__":
+    help(plot)
