@@ -30,14 +30,13 @@ def plot(function,min=-10,max=10):
     """
     함수를 그래프로 보여주는 함수
     """
-    sp.plot(function,(x,min,max),axis_center=(0,0))
-    return
+    try:
+        sp.plot(function,(x,min,max),axis_center=(0,0))
+        return
+    except:
+        sp.plotting.plot3d(function)
 
-def unit(function):
-    """
-    unit step function 입니다. 곱하기가 아닌 unit(function)으로 사용합니다.
-    """
-    return function * sp.Heaviside(function, 1)
+unit=sp.Heaviside
 
 def fact(n):
     """
@@ -301,6 +300,46 @@ def markov_chain(n,start,arr):
     """
     return matrix_power(arr,n)[start-1]
 
+def p_value(a,p_value):
+    """
+    과제14번 p_value(시행의 확률), a(이정도보다도 극한의 확률을 뚫으면 인정)
+    """
+    if p_value<a:
+        return "reject H0 and accept H1"
+    else:
+        return "do not reject H0 and accept H0"
+
+def type_error():
+    """
+    과제15번 타입1에러, 타입2에러
+    """
+    print("""
+          type 1 에러 : H0이 맞는데 reject함
+          type 2 에러 : H0이 틀렸는데 accept함
+          """)
+    
+def professor_score(Ex_f,Ex_so,Ex_j,Ex_se,Ex,num_f,num_s,num_j):
+    """
+    f기대점수 sopho기대점수 j기대점수 senior기대점수, 총기대점수, freshman수,sopho수,junior수
+    """
+    avg_freshman = Ex_f
+    avg_sophomore = Ex_so
+    avg_junior = Ex_j
+    avg_senior = Ex_se
+    x=sp.Symbol('x')
+    num_freshman = num_f
+    num_sophomore = num_s
+    num_junior = num_j
+
+    num_total=x+num_freshman+num_sophomore+num_junior
+    avg_total=Ex
+    avg_total_var= (avg_freshman*num_freshman + avg_junior*num_junior + avg_sophomore*num_sophomore + x*avg_senior)/num_total
+
+    equ=avg_total_var-avg_total
+    return (sp.solve(equ,x))
+
+def information(pa):
+    return -log(pa,2)
+
 if __name__ == "__main__":
-    arr=np.array([[0.3,0.5,0.2],[0.3,0.5,0.2],[0.3,0.5,0.2]])
-    print(markov_chain(2,3,arr))
+    pass
