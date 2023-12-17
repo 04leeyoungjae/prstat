@@ -6,3 +6,6 @@
 
 ## 설치 방법
 pip install prstat
+
+## 사용 방법(권장)
+from prstat.prstat import *

@@ -5,7 +5,6 @@ function의 미지수는 가능하면 x로 통일해주세요
 참고로 e를 제외한 a-z는 symbol로 설정되어 있으며 e는 자연로그의 밑 e로 선언되어있습니다.
 """
 import sympy as sp
-import numpy as np
 from numpy.linalg import matrix_power
 from fractions import Fraction as frac
 a,b,c,d,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z=sp.symbols("a b c d f g h i j k l m n o p q r s t u v w x y z")
@@ -25,6 +24,10 @@ solve=sp.solve
 branch=sp.Piecewise
 sigma=sp.summation
 expand=sp.expand
+
+def help_me():
+    import prstat.prstat as pr
+    print(open(pr.__file__,encoding="utf-8").read())
 
 def plot(function,min=-10,max=10):
     """
@@ -229,10 +232,9 @@ def Ex_PMF(function, min,max):
     expectation = sp.summation(x * function.subs(c, c_value), (x, interval.start, interval.end))
     return expectation
 
-def Ex_CDF(function, min_value, max_value):
-    print("주의 검증안됨")
-    interval = sp.Interval(min_value, max_value)
-    expectation = sp.summation(x * (function - function.subs(x, x - 1)), (x, interval.start, interval.end))
+def Ex_CDF(function, min_value=-inf, max_value=inf):
+    pdf=diff(function,x)
+    expectation = integral(x * pdf, (x, min_value, max_value))
     return expectation
 
 def game_of_chance(num_games,win_rate,A_lose,A_win):
