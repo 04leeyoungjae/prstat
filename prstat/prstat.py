@@ -292,7 +292,7 @@ def calculate_statistics(cdf):
     fourth_moment = sp.integrate((x - mean)**4 * sp.diff(cdf, x), (x, -sp.oo, sp.oo))
     kurtosis = sp.simplify((fourth_moment / variance**2))
 
-    return map(float,[mean, variance, skewness, kurtosis])
+    return list(map(float,[mean, variance, skewness, kurtosis]))
 
 def markov_chain(n,start,arr):
     """
